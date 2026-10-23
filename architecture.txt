@@ -1,0 +1,25 @@
+from src.regimes.macro_filter import MacroRegimeEngine       # Layer 1
+from src.confirmation.relative_strength import RSFilter       # Layer 2
+from src.setups.demand_zones import SetupScanner              # Layer 3
+from src.risk.exposure_manager import RiskExposureManager     # Layer 4
+from src.narrative.catalyst_filter import NarrativeFilter     # Layer 5
+
+src/
+├── backtest/
+│   └── engine.py
+├── data/
+│   ├── cache/
+│   ├── cache_manager.py
+│   └── data_quality.py           # Layer 0: Data Integrity & Sanity
+├── confirmation/
+│   └── relative_strength.py      # Layer 2: Universe Gating & RS
+├── narrative/
+│   └── catalyst_filter.py        # Layer 5: Narrative & Catalyst Filter
+├── regimes/
+│   └── macro_filter.py           # Layer 1: Macro & Regime Engine
+├── risk/
+│   └── exposure_manager.py       # Layer 4: Position Sizing & Exposure
+├── setups/
+│   └── demand_zones.py           # Layer 3: Demand Zone & Volume Setups
+└── utils/
+    └── config_loader.py

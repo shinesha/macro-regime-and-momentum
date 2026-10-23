@@ -1,0 +1,45 @@
+# universe:
+#   benchmarks: ["SPY", "QQQ", "^VIX"]
+#   sectors: ["SMH", "IGV", "XLK"]
+#   targets: ["NVDA", "AMD", "AVGO", "TSM", "MRVL"]
+
+# parameters:
+#   lookback_period: 252
+#   relative_strength_window: 63
+#   demand_zone_volume_threshold: 1.5
+#   regime_rules:
+#     vix_high_threshold: 25.0
+#     sma_trend_filter_period: 200
+
+universe:
+  benchmarks: ["SPY", "QQQ", "^VIX"]
+  primary_indices: ["SP500", "NASDAQ100", "FTSE350"]
+  min_average_daily_volume: 5000000  # $5M minimum daily dollar volume filter
+  
+  # Your targeted equity universe for local caching and scanning
+  # EXCLUDED_TICKERS = {'UBER', 'ABNB', 'MRVL','GOOGL', 'INTC', 'NXPI', 'MRVL', 'AMZN', 'TSM', 'ADBE', 'TXN', 'QRVO', 'CRM', 'SWKS', 'NOW', 'AVGO', 'NFLX', 'IBM', 'SMCI', 'MCHP', 'SNOW', 'PLTR', 'ORCL', 'MSFT', 'TSLA'}
+  tickers:
+  
+    - NVDA
+    - AMD
+    - QCOM
+    - MU
+    - AMAT
+    - LRCX
+    - KLAC
+    - ARM
+    - ADI
+    - "ON"
+    - AAPL
+    - META
+    - ANET
+    - DELL
+    - CSCO
+
+parameters:
+  lookback_period: 252
+  relative_strength_window: 63
+  demand_zone_volume_threshold: 1.5
+  regime_rules:
+    vix_high_threshold: 25.0
+    sma_trend_filter_period: 200
