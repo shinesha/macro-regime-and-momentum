@@ -15,8 +15,8 @@ python -m src.setups.demand_zones
 Set PCT_PARAM to same value as optimal releative strength value found by the backtest engine and backtest analytics.
 
 4/ Run backtest
-python -m src.backtest.engine   - test values of releative strength to find the optimal for the trading period. 
-You have to manually choose optimal_pct variable for it to display equity curve for each indidviaul asset using that releative strength value.  - Outputs equity curve regards a user chosen rs value. 
+python -m src.backtest.engine   - test values of relative strength to find the optimal for the trading period. 
+You have to manually choose optimal_pct variable for it to display equity curve for each individual asset using that relative strength value.  - Outputs equity curve regards a user chosen rs value. 
 
  CAPITAL-EFFICIENT OPTIMAL THRESHOLD: top_pct = 0.55 (55%)
    • Aggregate Net PnL   : $100,959.14
