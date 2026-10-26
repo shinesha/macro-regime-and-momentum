@@ -1,8 +1,10 @@
-workflow is run data.cache_manager, backtest.engine, run backtest.analyze_results -> outputs optimal relative strength parameter
-input optmal releative strength parameter to and run setups.demand_zones after US market close each day to decide what to buy at U.S. open the following day.
-Make sure you run data.cache_manager everyday before setups.demand_zones so you have latest data. 
+WORKFLOW
+A/ run data.cache_manager, backtest.engine, run backtest.analyze_results -> outputs optimal relative strength parameter
+B/ input optmal releative strength parameter to and run setups.demand_zones after US market close each day to decide what to buy at U.S. open the following day.
+[Make sure you run data.cache_manager everyday before setups.demand_zones so you have latest data.] 
 [I look at the win loss of the indvidual stock at that relative strength parameter before doing the trade.]  
 
+EXPLANATION OF RELEVANT SCRIPTS
 1/Activate VM
 .  venv  Scripts  Activate.ps1    
 2/ Update Data 
