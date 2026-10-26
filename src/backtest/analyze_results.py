@@ -163,8 +163,197 @@ def analyze_sweep_excel(excel_path: str):
     plt.show()
 
 
+def plot_stock_equity_curve(excel_path: str, ticker: str = "QCOM"):
+    """
+    Loads trade logs, plots a step-wise equity curve, and adds interactive 
+    hover tooltips showing Entry Date, Exit Date, Trade PnL, and Cumulative PnL.
+    """
+    try:
+        xls = pd.ExcelFile(excel_path)
+        target_sheet = next((s for s in ["Trade Log", "Trades", "Trade_Log"] if s in xls.sheet_names), xls.sheet_names[0])
+        trades_df = pd.read_excel(excel_path, sheet_name=target_sheet)
+    except Exception as e:
+        print(f"[!] Could not load trade log sheet: {e}")
+        return
+
+    # Flexible column mapping
+    ticker_col = next((col for col in ["ticker", "symbol", "stock"] if col in trades_df.columns), None)
+    exit_date_col = next((col for col in ["exit_date", "date", "sell_date", "close_date"] if col in trades_df.columns), None)
+    entry_date_col = next((col for col in ["entry_date", "open_date", "start_date", "buy_date"] if col in trades_df.columns), None)
+    pnl_col = next((col for col in ["net_pnl", "pnl", "profit", "gain"] if col in trades_df.columns), None)
+
+    if not ticker_col or not exit_date_col or not pnl_col:
+        print("[!] Error: Could not automatically detect required columns.")
+        return
+
+    # Filter and sort data chronologically
+    stock_trades = trades_df[trades_df[ticker_col].astype(str).str.upper() == ticker.upper()].copy()
+    if stock_trades.empty:
+        print(f"[!] No trades found for ticker: {ticker.upper()}")
+        return
+
+    stock_trades[exit_date_col] = pd.to_datetime(stock_trades[exit_date_col])
+    if entry_date_col:
+        stock_trades[entry_date_col] = pd.to_datetime(stock_trades[entry_date_col])
+
+    stock_trades = stock_trades.sort_values(exit_date_col)
+
+    # Calculate metrics
+    stock_trades["cumulative_pnl"] = stock_trades[pnl_col].cumsum()
+    stock_trades["dot_color"] = stock_trades[pnl_col].apply(lambda x: "#2ca02c" if x >= 0 else "#d62728")
+
+    total_pnl = stock_trades["cumulative_pnl"].iloc[-1]
+    total_trades = len(stock_trades)
+    win_count = len(stock_trades[stock_trades[pnl_col] > 0])
+    win_rate = (win_count / total_trades) * 100 if total_trades > 0 else 0
+
+    # Plotting
+    plt.figure(figsize=(12, 6))
+    
+    plt.plot(
+        stock_trades[exit_date_col],
+        stock_trades["cumulative_pnl"],
+        drawstyle="steps-post",
+        color="#1f77b4",
+        linewidth=2,
+        alpha=0.8,
+        label="Equity Path"
+    )
+
+    scatter = plt.scatter(
+        stock_trades[exit_date_col],
+        stock_trades["cumulative_pnl"],
+        c=stock_trades["dot_color"],
+        s=60,
+        zorder=5,
+        edgecolors="black",
+        linewidths=0.8,
+        label="Executed Trades (Green=Win, Red=Loss)"
+    )
+
+    plt.axhline(0, color="gray", linestyle="--", alpha=0.7, linewidth=1)
+    plt.title(
+        f"{ticker.upper()} Equity Curve | Net PnL: ${total_pnl:,.2f} | Trades: {total_trades} | Win Rate: {win_rate:.1f}%", 
+        fontsize=12, 
+        fontweight="bold"
+    )
+    plt.xlabel("Trade Exit Date", fontsize=11, fontweight="bold")
+    plt.ylabel("Cumulative Net PnL ($)", fontsize=11, fontweight="bold")
+    plt.grid(True, linestyle=":", alpha=0.6)
+    plt.legend(loc="upper left")
+
+    # Add interactive hover tooltips using mplcursors
+    try:
+        import mplcursors
+        cursor = mplcursors.cursor(scatter, hover=True)
+        @cursor.connect("add")
+        def on_add(sel):
+            idx = sel.index
+            row = stock_trades.iloc[idx]
+            entry_str = row[entry_date_col].strftime('%Y-%m-%d') if entry_date_col and pd.notnull(row[entry_date_col]) else "N/A"
+            exit_str = row[exit_date_col].strftime('%Y-%m-%d') if pd.notnull(row[exit_date_col]) else "N/A"
+            pnl_val = row[pnl_col]
+            cum_pnl = row["cumulative_pnl"]
+            
+            sel.annotation.set_text(
+                f"Trade #{idx + 1}\n"
+                f"• Entry: {entry_str}\n"
+                f"• Exit:  {exit_str}\n"
+                f"• PnL:   ${pnl_val:,.2f}\n"
+                f"• Total: ${cum_pnl:,.2f}"
+            )
+            sel.annotation.get_bbox_box().set(alpha=0.9, fc="white", ec="black")
+    except ImportError:
+        print("[!] Note: Install `mplcursors` via pip to enable interactive hover tooltips.")
+
+    plt.tight_layout()
+    plt.show()
+# def plot_stock_equity_curve(excel_path: str, ticker: str = "QCOM"):
+#     """
+#     Loads trade logs, filters for a specific stock, and plots a clear step-wise 
+#     equity curve with color-coded winning (green) and losing (red) trades.
+#     """
+#     try:
+#         xls = pd.ExcelFile(excel_path)
+#         target_sheet = next((s for s in ["Trade Log", "Trades", "Trade_Log"] if s in xls.sheet_names), xls.sheet_names[0])
+#         trades_df = pd.read_excel(excel_path, sheet_name=target_sheet)
+#     except Exception as e:
+#         print(f"[!] Could not load trade log sheet: {e}")
+#         return
+
+#     # Flexible column mapping
+#     ticker_col = next((col for col in ["ticker", "symbol", "stock"] if col in trades_df.columns), None)
+#     date_col = next((col for col in ["exit_date", "date", "sell_date", "close_date"] if col in trades_df.columns), None)
+#     pnl_col = next((col for col in ["net_pnl", "pnl", "profit", "gain"] if col in trades_df.columns), None)
+
+#     if not ticker_col or not date_col or not pnl_col:
+#         print("[!] Error: Could not automatically detect required columns.")
+#         return
+
+#     # Filter and sort data chronologically
+#     stock_trades = trades_df[trades_df[ticker_col].astype(str).str.upper() == ticker.upper()].copy()
+#     if stock_trades.empty:
+#         print(f"[!] No trades found for ticker: {ticker.upper()}")
+#         return
+
+#     stock_trades[date_col] = pd.to_datetime(stock_trades[date_col])
+#     stock_trades = stock_trades.sort_values(date_col)
+
+#     # Calculate cumulative PnL & assign colors (Green for win, Red for loss)
+#     stock_trades["cumulative_pnl"] = stock_trades[pnl_col].cumsum()
+#     stock_trades["dot_color"] = stock_trades[pnl_col].apply(lambda x: "#2ca02c" if x >= 0 else "#d62728")
+
+#     total_pnl = stock_trades["cumulative_pnl"].iloc[-1]
+#     total_trades = len(stock_trades)
+#     win_count = len(stock_trades[stock_trades[pnl_col] > 0])
+#     win_rate = (win_count / total_trades) * 100 if total_trades > 0 else 0
+
+#     # Plotting
+#     plt.figure(figsize=(12, 6))
+    
+#     # Step plot for accurate discrete equity changes
+#     plt.plot(
+#         stock_trades[date_col],
+#         stock_trades["cumulative_pnl"],
+#         drawstyle="steps-post",
+#         color="#1f77b4",
+#         linewidth=2,
+#         alpha=0.8,
+#         label="Equity Path"
+#     )
+
+#     # Scatter overlay for individual trades (Green = Win, Red = Loss)
+#     plt.scatter(
+#         stock_trades[date_col],
+#         stock_trades["cumulative_pnl"],
+#         c=stock_trades["dot_color"],
+#         s=60,
+#         zorder=5,
+#         edgecolors="black",
+#         linewidths=0.8,
+#         label="Executed Trades (Green=Win, Red=Loss)"
+#     )
+
+#     # Styling and formatting
+#     plt.axhline(0, color="gray", linestyle="--", alpha=0.7, linewidth=1)
+#     plt.title(
+#         f"{ticker.upper()} Equity Curve | Net PnL: ${total_pnl:,.2f} | Trades: {total_trades} | Win Rate: {win_rate:.1f}%", 
+#         fontsize=12, 
+#         fontweight="bold"
+#     )
+#     plt.xlabel("Trade Exit Date", fontsize=11, fontweight="bold")
+#     plt.ylabel("Cumulative Net PnL ($)", fontsize=11, fontweight="bold")
+#     plt.grid(True, linestyle=":", alpha=0.6)
+#     plt.legend(loc="upper left")
+#     plt.tight_layout()
+#     plt.show()
+
 if __name__ == "__main__":
     excel_file = os.path.join(
         project_root, "data", "backtest_results", "sweep_analytics.xlsx"
     )
     analyze_sweep_excel(excel_file)
+
+
+    # 2. Plot equity curve for a specific individual stock (e.g., Apple / AAPL)
+    plot_stock_equity_curve(excel_file, ticker="QCOM")
