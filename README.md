@@ -28,3 +28,21 @@ You have to manually choose optimal_pct variable for it to display equity curve 
 
 5/ Analyse the backtest results spreadsheet
 python -m src.backtest.analyze_results - - outputs the optimal relative strength parameter. Displays a graph showing this. 
+
+
+6/ SLIPPAGE DATA
+Run fetch_intraday_data.py - downloads the 1m, 5m, and 10m price on the date of entry for the trades in the backtest.
+Previous, backtest assumes we can enter at the reported open.
+This data tells us what prices the stock trade at. 
+
+7/ SLIPPAGE ANALYSIS
+Updates the Excel Workbook: Injects these intraday price columns into each individual ticker tab within sweep_analytics.xlsx.
+
+Applies Conditional Formatting: Automatically color-codes the intraday price cells. (blue font if the intraday price is below your entry price, red font if it is above).
+
+Simulates 1-Minute Execution PnL: Dynamically recalculates trade PnLs, overall win rates, and profit per trade based on the actual 1-minute execution price (price_1m) instead of the theoretical daily open, effectively stress-testing the strategy against opening slippage.
+
+Outputs Terminal Metrics: Prints the audited performance metrics block directly to your terminal.
+
+Outputs Sweep Summary table regards on the sweep summary table of excel.
+

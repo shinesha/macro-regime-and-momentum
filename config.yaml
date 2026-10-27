@@ -11,6 +11,19 @@
 #     vix_high_threshold: 25.0
 #     sma_trend_filter_period: 200
 
+# universe:
+#   benchmarks: ["SPY", "QQQ", "^VIX"]
+#   sectors: ["SMH", "IGV", "XLK"]
+#   targets: ["NVDA", "AMD", "AVGO", "TSM", "MRVL"]
+
+# parameters:
+#   lookback_period: 252
+#   relative_strength_window: 63
+#   demand_zone_volume_threshold: 1.5
+#   regime_rules:
+#     vix_high_threshold: 25.0
+#     sma_trend_filter_period: 200
+
 universe:
   benchmarks: ["SPY", "QQQ", "^VIX"]
   primary_indices: ["SP500", "NASDAQ100", "FTSE350"]

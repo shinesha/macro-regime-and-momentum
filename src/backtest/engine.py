@@ -737,7 +737,7 @@ if __name__ == "__main__":
     print("==================================================")
 
     # Optional plot generation for optimal top_pct (e.g., 0.50 or 0.80)
-    optimal_pct = 0.50
+    optimal_pct = 0.55
     final_tester = StrictMultiAssetBacktester(
         top_pct=optimal_pct, use_short_term_filter=USE_FILTER
     )
