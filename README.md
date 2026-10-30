@@ -1,3 +1,6 @@
+Also read the Quant Strategy Specification Manual pdf attached in this repo
+
+
 WORKFLOW
 A/ run data.cache_manager, backtest.engine, run backtest.analyze_results -> outputs optimal relative strength parameter
 B/ input optimal relative strength parameter to and run setups.demand_zones after US market close each day to decide what to buy at U.S. open the following day.
